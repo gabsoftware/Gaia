@@ -61,14 +61,18 @@ namespace Gaia
             }
         }
 
+        public Tile[,] Tiles
+        {
+            get;
+            set;
+        }
+
 
         public void Initialize(WorldSize size, Vector2 position)
         {
-
             //temporary
             this.Size = size;
             this.Generate("test");
-
         }
 
         public void Update()
@@ -85,6 +89,10 @@ namespace Gaia
         {
             int betterSeed = this.BetterSeed( seed );
             Random r = new Random(betterSeed);
+
+            int i, j, n, m;
+
+            Texture2D texture;
 
             int surfaceLow  = r.Next( (int)(Math.Round( this.Height * 0.70 ) ), (int)(Math.Round( this.Height * 0.75 )));
             int surfaceHigh = r.Next( (int)(Math.Round( this.Height * 0.80 ) ), (int)(Math.Round( this.Height * 0.85 )));
@@ -104,22 +112,25 @@ namespace Gaia
             int[] pikes_7  = new int[  512];
             int[] pikes_8  = new int[ 1024];
             int[] pikes_9  = new int[ 2048];
-            int[] pikes_10 = new int[ 4096]; // small world limit
-            
-            int[] pikes_11 = new int[0];
-            if( this.Size >= WorldSize.Medium )
-                pikes_11 = new int[ 8192]; // medium world limit
+            int[] pikes_10 = new int[ 4096];
+            int[] pikes_11 = new int[ 8192]; // small world limit
             
             int[] pikes_12 = new int[0];
-            if( this.Size >= WorldSize.Big )
-                pikes_12 = new int[16384]; // big world limit
+            if( this.Size >= WorldSize.Medium )
+                pikes_12 = new int[ 16384]; // medium world limit
             
             int[] pikes_13 = new int[0];
+            if( this.Size >= WorldSize.Big )
+                pikes_13 = new int[32768]; // big world limit
+            
+            int[] pikes_14 = new int[0];
             if( this.Size >= WorldSize.Extra )
-                pikes_13 = new int[32768]; // extra world limit
+                pikes_14 = new int[65536]; // extra world limit
+
+            int[] pikes = null;
 
            
-            for (int i = 0, n = pikes_1.Length; i < n; i++)
+            for (i = 0, n = pikes_1.Length; i < n; i++)
             {
                 pikes_1[i] = r.Next(surfaceLow, surfaceHigh);                
             }
@@ -132,17 +143,56 @@ namespace Gaia
             pikes_8  = fractalMountains( r, pikes_7,  pikes_8,  8  );
             pikes_9  = fractalMountains( r, pikes_8,  pikes_9,  9  );
             pikes_10 = fractalMountains( r, pikes_9,  pikes_10, 10 );
+            if (this.Size >= WorldSize.Small)
+            {
+                pikes_11 = fractalMountains(r, pikes_10, pikes_11, 11);
+                pikes = pikes_11;
+            }
             if (this.Size >= WorldSize.Medium)
-                pikes_11 = fractalMountains( r, pikes_10, pikes_11, 11 );
+            {
+                pikes_12 = fractalMountains(r, pikes_11, pikes_12, 12);
+                pikes = pikes_12;
+            }
             if (this.Size >= WorldSize.Big)
-                pikes_12 = fractalMountains( r, pikes_11, pikes_12, 12 );
+            {
+                pikes_13 = fractalMountains(r, pikes_12, pikes_13, 13);
+                pikes = pikes_13;
+            }
             if (this.Size >= WorldSize.Extra)
-                pikes_13 = fractalMountains( r, pikes_12, pikes_13, 13 );
+            {
+                pikes_14 = fractalMountains(r, pikes_13, pikes_14, 14);
+                pikes = pikes_14;
+            }
             
-            for (int j = 0, m = pikes_10.Length; j < m; j++)
+            for ( j = 0, m = pikes_10.Length; j < m; j++)
             {
                 Helper.Log(pikes_10[j].ToString());
             }
+
+            // load the terrain textures
+            //Content.Load<Texture2D>("Graphics\\dirt_middle")
+
+            //create the Tile array
+            Tiles = new Tile[this.Width, this.Height];
+            
+            
+            for ( i = 0; i < this.Width; i++)
+            {
+                for (j = 0; j < pikes[i]; j++)
+                {
+                    Tiles[i, j] = new Tile();
+                    if( j < pikes[i] - 1 )
+                    {
+                        texture = Textures.Get( "dirt_middle" );
+                    }
+                    else
+                    {
+                        texture = Textures.Get( "dirt_top" );
+                    }
+                    Tiles[i, j].Initialize(texture, new Vector2(i, j), 2, TilePhysics.Solid, 0);
+                }
+            }
+
             
         }
 

@@ -1,10 +1,10 @@
 ﻿#region Using Statements
 using System;
 using System.Collections.Generic;
+using Gaia;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Gaia;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Storage;
 using Microsoft.Xna.Framework.GamerServices;
@@ -83,6 +83,9 @@ namespace Gaia
 
             // TODO: use this.Content to load your game content here
 
+            //load the textures
+            Textures.Load(this);
+
             //load the world ressources
             Vector2 playerPositionInWorld = new Vector2(world.Width / 2, world.Height / 2);
             world.Initialize(WorldSize.Small, playerPositionInWorld);
@@ -91,7 +94,7 @@ namespace Gaia
             Vector2 playerPositionInScreen = new Vector2(
                 GraphicsDevice.Viewport.TitleSafeArea.X + GraphicsDevice.Viewport.TitleSafeArea.Width / 2,
                 GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
-            player.Initialize(Content.Load<Texture2D>("Graphics\\player"), playerPositionInScreen);            
+            player.Initialize( Textures.Get( "player" ), playerPositionInScreen);            
         }
 
         /// <summary>
