@@ -184,6 +184,8 @@ namespace Gaia
             {
                 this.player.Direction = PlayerDirection.Right;
             }
+
+
                 
             this.player.Position.X += x_move;
             this.player.Position.Y += y_move;
