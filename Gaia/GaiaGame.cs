@@ -87,8 +87,7 @@ namespace Gaia
             Textures.Load(this);
 
             //load the world ressources
-            Vector2 playerPositionInWorld = new Vector2(world.Width / 2, world.Height / 2);
-            world.Initialize(WorldSize.Small, playerPositionInWorld);
+            world.Initialize(WorldSize.Small);
 
             //load the player ressources
             Vector2 playerPositionInScreen = new Vector2(

@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text;
+using ProtoBuf;
+using System.IO;
 
 namespace Gaia
 {
@@ -31,20 +33,24 @@ namespace Gaia
         Hell
     }
 
+    [ProtoContract]
     class World
     {
+        [ProtoMember(1)]
         public WorldDifficulty Difficulty
         {
             get;
             set;
         }
 
+        [ProtoMember(2)]
         public WorldSize Size
         {
             get;
             set;
         }
 
+        //[ProtoMember(3)]
         public int Width
         {
             get
@@ -53,6 +59,7 @@ namespace Gaia
             }
         }
 
+        //[ProtoMember(4)]
         public int Height
         {
             get
@@ -61,14 +68,15 @@ namespace Gaia
             }
         }
 
-        public Tile[,] Tiles
+        //[ProtoMember(5)]
+        public Block[,] Tiles
         {
             get;
             set;
         }
 
 
-        public void Initialize(WorldSize size, Vector2 position)
+        public void Initialize(WorldSize size)
         {
             //temporary
             this.Size = size;
@@ -169,18 +177,14 @@ namespace Gaia
                 Helper.Log(pikes_10[j].ToString());
             }
 
-            // load the terrain textures
-            //Content.Load<Texture2D>("Graphics\\dirt_middle")
-
             //create the Tile array
-            Tiles = new Tile[this.Width, this.Height];
-            
+            Tiles = new Block[this.Width, this.Height];            
             
             for ( i = 0; i < this.Width; i++)
             {
                 for (j = 0; j < pikes[i]; j++)
                 {
-                    Tiles[i, j] = new Tile();
+                    Tiles[i, j] = new Block();
                     if( j < pikes[i] - 1 )
                     {
                         texture = Textures.Get( "dirt_middle" );
@@ -192,6 +196,8 @@ namespace Gaia
                     Tiles[i, j].Initialize(texture, new Vector2(i, j), 2, TilePhysics.Solid, 0);
                 }
             }
+
+            bool save_ok = this.Save();
 
             
         }
@@ -249,6 +255,18 @@ namespace Gaia
 
             result = BitConverter.ToInt32(hash, 0);
             Helper.Log( "Seed: " + result.ToString() );
+            return result;
+        }
+
+        public bool Save()
+        {
+            bool result = false;
+
+            using (var file = File.Create("world.bin"))
+            {
+                Serializer.Serialize<World>(file, this);
+            }
+
             return result;
         }
     }
