@@ -69,7 +69,7 @@ namespace Gaia
         }
 
         //[ProtoMember(5)]
-        public Block[,] Tiles
+        public Tile[,] Tiles
         {
             get;
             set;
@@ -178,13 +178,13 @@ namespace Gaia
             }
 
             //create the Tile array
-            Tiles = new Block[this.Width, this.Height];            
+            Tiles = new Tile[this.Width, this.Height];            
             
             for ( i = 0; i < this.Width; i++)
             {
                 for (j = 0; j < pikes[i]; j++)
                 {
-                    Tiles[i, j] = new Block();
+                    Tiles[i, j] = new Tile();
                     if( j < pikes[i] - 1 )
                     {
                         texture = Textures.Get( "dirt_middle" );
